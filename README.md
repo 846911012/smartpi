@@ -9,10 +9,17 @@ Youtube：米月
 Youtube频道地址：https://www.youtube.com/channel/UCr4HCEgaZ0cN5_7tLHS_xAg
 ---
 </p>
-<h1>安装命令：</h1>
+<h1>大众版：</h1>
 </p>
 <code>
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/pzwsquare/smartpi/master/smartpi)
+</code>
+</p>
+</p>
+<h1>PVE（CT版）：</h1>
+</p>
+<code>
+bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/pzwsquare/smartpi/master/smpi_ct)
 </code>
 </p>
 </p>
