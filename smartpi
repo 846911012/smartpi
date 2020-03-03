@@ -36,6 +36,8 @@ read gate_ip
 
 eth_n=$(ip --oneline link show up | grep -v "lo" | awk '{print$2;exit}' | cut -d':' -f1 | cut -d'@' -f1)
 
+pi_wd="4739aedfec7b085af55a29976725a386ad39c9d88f1228c6cffe4ee52971b206"
+
 cat > /etc/apt/sources.list << EOF
 deb http://mirrors.aliyun.com/debian $(cat /etc/os-release | grep VERSION= | cut -d '(' -f2 | cut -d ')' -f1) main
 deb http://mirrors.aliyun.com/debian-security $(cat /etc/os-release | grep VERSION= | cut -d '(' -f2 | cut -d ')' -f1)/updates main
@@ -98,9 +100,10 @@ systemctl daemon-reload > /dev/null 2>&1
 systemctl enable smartdns > /dev/null 2>&1
 systemctl restart smartdns > /dev/null 2>&1
 
-mkdir /etc/pihole/
 
-pi_wd="4739aedfec7b085af55a29976725a386ad39c9d88f1228c6cffe4ee52971b206"
+cd ~
+
+mkdir /etc/pihole/
 
 echo "" > /etc/pihole/adlists.list
 
