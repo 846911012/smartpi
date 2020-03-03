@@ -25,6 +25,8 @@ sd="https://github.com/pymumu/smartdns/releases/download/Release30/smartdns.1.20
 eth_n=$(ip --oneline link show up | grep -v "lo" | awk '{print$2;exit}' | cut -d':' -f1 | cut -d'@' -f1)
 loc_ip=$(ip a | grep "$eth_n" | awk '{print $2}' | awk 'END {print}' | cut -d'/' -f1)
 
+pi_wd="4739aedfec7b085af55a29976725a386ad39c9d88f1228c6cffe4ee52971b206"
+
 function install_smartpi(){
 
 cat > /etc/apt/sources.list << EOF
@@ -43,7 +45,7 @@ wget -O ~/smartdns.deb $sd
 dpkg -i smartdns.deb
 
 cat << EOF > /etc/smartdns/smartdns.conf
-bind :53
+bind :5599
 cache-size 20480
 #prefetch-domain yes
 rr-ttl 86400
@@ -100,32 +102,19 @@ PIHOLE_DNS_2=
 QUERY_LOGGING=true
 INSTALL_WEB_SERVER=true
 INSTALL_WEB_INTERFACE=true
-LIGHTTPD_ENABLED=false
+LIGHTTPD_ENABLED=true
 BLOCKING_ENABLED=true
 WEBPASSWORD=$pi_wd
-DNSMASQ_LISTENING=single
-DNS_FQDN_REQUIRED=true
-DNS_BOGUS_PRIV=true
-DNSSEC=false
-CONDITIONAL_FORWARDING=false
+#DNSMASQ_LISTENING=single
+#DNS_FQDN_REQUIRED=true
+#DNS_BOGUS_PRIV=true
+#DNSSEC=false
+#CONDITIONAL_FORWARDING=false
 EOF
 bash <(wget --no-check-certificate -qO- http://raw.githubusercontent.com/pi-hole/pi-hole/master/automated%20install/basic-install.sh) /dev/stdin --unattended
 
-#systemctl mask --now dhcpcd > /dev/null 2>&1
-#systemctl daemon-reload > /dev/null 2>&1
-
-#rm -rf /etc/resolv.conf
-#echo "" > /etc/resolvconf/run/interface/original.resolvconf
-#echo "" > /etc/resolvconf/resolv.conf.d/original
-#echo "nameserver 127.0.0.1" > /etc/resolvconf/resolv.conf.d/base
-#echo "option use-vc"  > /etc/resolvconf/resolv.conf.d/tail
-#ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
-#resolvconf -u
-
-
-
-#sed -i '/server=/d'  /etc/dnsmasq.d/01-pihole.conf
-#sed -i '/interface=/i\server=127.0.0.1#5599' /etc/dnsmasq.d/01-pihole.conf
+systemctl mask --now dhcpcd > /dev/null 2>&1
+systemctl daemon-reload > /dev/null 2>&1
 
 cat << EOF > /etc/pihole/pihole-FTL.conf
 PRIVACYLEVEL=0
@@ -134,8 +123,6 @@ EOF
 
 pihole restartdns
 
-
-#set_ip_dns
 
 
 	green " ===========================请重启debian系统=============================="
@@ -149,23 +136,6 @@ pihole restartdns
 
 }
 
-set_ip_dns(){
-
-cat << EOF > /etc/resolv.conf
-nameserver 114.114.114.114
-EOF
-
-apt install --no-install-recommends --no-install-suggests -y resolvconf
-
-cat << EOF > /etc/resolvconf/resolv.conf.d/base
-nameserver 114.114.114.114
-EOF
-
-cat << EOF > /etc/resolvconf/resolv.conf.d/original
-nameserver 114.114.114.114
-EOF
-
-}
 
 function update_smartdns(){
 if test -s /etc/smartdns/smartdns.conf.bak; then
