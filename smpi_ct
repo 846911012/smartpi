@@ -22,11 +22,10 @@ byellow(){
 
 sd="https://github.com/pymumu/smartdns/releases/download/Release30/smartdns.1.2020.02.25-2212.x86_64-debian-all.deb"
 
-function install_smartpi(){
-
-loc_ip=$(ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|tr -d "addr:")
-
 eth_n=$(ip --oneline link show up | grep -v "lo" | awk '{print$2;exit}' | cut -d':' -f1 | cut -d'@' -f1)
+loc_ip=$(ip a | grep "$eth_n" | awk '{print $2}' | awk 'END {print}' | cut -d'/' -f1)
+
+function install_smartpi(){
 
 cat > /etc/apt/sources.list << EOF
 deb http://mirrors.aliyun.com/debian $(cat /etc/os-release | grep VERSION= | cut -d '(' -f2 | cut -d ')' -f1) main
