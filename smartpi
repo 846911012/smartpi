@@ -122,18 +122,27 @@ CONDITIONAL_FORWARDING=false
 EOF
 
 cd ~
-
-git clone --depth 1 https://github.com/pi-hole/pi-hole.git Pi-hole
-bash ~/Pi-hole/"automated install"/basic-install.sh /dev/stdin --unattended
-rm -rf ~/Pi-hole
+bash <(wget --no-check-certificate -qO- http://raw.githubusercontent.com/pi-hole/pi-hole/master/automated%20install/basic-install.sh) /dev/stdin --unattended
 
 systemctl mask --now dhcpcd > /dev/null 2>&1
 systemctl daemon-reload > /dev/null 2>&1
 
-systemctl restart pihole-FTL
-pihole -f
+cat << EOF > /etc/pihole/pihole-FTL.conf
+PRIVACYLEVEL=0
+AAAA_QUERY_ANALYSIS=no
+EOF
 
-set_ip_dns
+rm -rf /etc/resolv.conf
+echo "" > /etc/resolvconf/run/interface/original.resolvconf
+echo "" > /etc/resolvconf/resolv.conf.d/original
+echo "nameserver 127.0.0.1" > /etc/resolvconf/resolv.conf.d/base
+echo "option use-vc"  > /etc/resolvconf/resolv.conf.d/tail
+ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
+resolvconf -u
+
+
+pihole restartdns
+
 
 
 	green " ===========================请重启debian系统=============================="
@@ -147,35 +156,7 @@ set_ip_dns
 
 }
 
-set_ip_dns(){
 
-cat << EOF > /etc/network/interfaces
-source /etc/network/interfaces.d/*
-
-auto lo
-
-auto  $eth_n
-iface $eth_n inet static
-  address $loc_ip
-  netmask 255.255.255.0
-  gateway $gate_ip
-EOF
-
-cat << EOF > /etc/resolv.conf
-nameserver 114.114.114.114
-EOF
-
-apt install --no-install-recommends --no-install-suggests -y resolvconf
-
-cat << EOF > /etc/resolvconf/resolv.conf.d/base
-nameserver 114.114.114.114
-EOF
-
-cat << EOF > /etc/resolvconf/resolv.conf.d/original
-nameserver 114.114.114.114
-EOF
-
-}
 
 function update_smartdns(){
 if test -s /etc/smartdns/smartdns.conf.bak; then
