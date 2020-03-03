@@ -111,21 +111,21 @@ CONDITIONAL_FORWARDING=false
 EOF
 bash <(wget --no-check-certificate -qO- http://raw.githubusercontent.com/pi-hole/pi-hole/master/automated%20install/basic-install.sh) /dev/stdin --unattended
 
-systemctl mask --now dhcpcd > /dev/null 2>&1
-systemctl daemon-reload > /dev/null 2>&1
+#systemctl mask --now dhcpcd > /dev/null 2>&1
+#systemctl daemon-reload > /dev/null 2>&1
 
-rm -rf /etc/resolv.conf
-echo "" > /etc/resolvconf/run/interface/original.resolvconf
-echo "" > /etc/resolvconf/resolv.conf.d/original
-echo "nameserver 127.0.0.1" > /etc/resolvconf/resolv.conf.d/base
-echo "option use-vc"  > /etc/resolvconf/resolv.conf.d/tail
-ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
-resolvconf -u
+#rm -rf /etc/resolv.conf
+#echo "" > /etc/resolvconf/run/interface/original.resolvconf
+#echo "" > /etc/resolvconf/resolv.conf.d/original
+#echo "nameserver 127.0.0.1" > /etc/resolvconf/resolv.conf.d/base
+#echo "option use-vc"  > /etc/resolvconf/resolv.conf.d/tail
+#ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
+#resolvconf -u
 
 
 
-sed -i '/server=/d'  /etc/dnsmasq.d/01-pihole.conf
-sed -i '/interface=/i\server=127.0.0.1#5599' /etc/dnsmasq.d/01-pihole.conf
+#sed -i '/server=/d'  /etc/dnsmasq.d/01-pihole.conf
+#sed -i '/interface=/i\server=127.0.0.1#5599' /etc/dnsmasq.d/01-pihole.conf
 
 cat << EOF > /etc/pihole/pihole-FTL.conf
 PRIVACYLEVEL=0
