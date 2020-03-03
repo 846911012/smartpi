@@ -36,8 +36,7 @@ EOF
 rm -rf /etc/apt/sources.list.d/unstable.list
 rm -rf /etc/apt/preferences.d/limit-unstable
 
-apt update && apt upgrade -y
-apt install --no-install-recommends --no-install-suggests -y sudo git net-tools dnsutils curl
+apt update && apt install -y sudo locales net-tools dnsutils ipset wget curl git jq unzip ca-certificates haveged subversion rsync apt-transport-https gnupg2 lighttpd
 source /etc/profile
 
 wget -O ~/smartdns.deb $sd
@@ -89,45 +88,54 @@ systemctl daemon-reload > /dev/null 2>&1
 systemctl enable smartdns > /dev/null 2>&1
 systemctl restart smartdns > /dev/null 2>&1
 
+
 cd ~
 mkdir -p /etc/pihole
-
-pi_wd="4739aedfec7b085af55a29976725a386ad39c9d88f1228c6cffe4ee52971b206"
-
 echo "" > /etc/pihole/adlists.list
-
-cat > /etc/pihole/setupVars.conf << EOF
+cat << EOF > /etc/pihole/setupVars.conf
 PIHOLE_INTERFACE=$eth_n
 IPV4_ADDRESS=$loc_ip/24
-QUERY_LOGGING=false
+PIHOLE_DNS_1=127.0.0.1#5599
+PIHOLE_DNS_2=
+QUERY_LOGGING=true
 INSTALL_WEB_SERVER=true
 INSTALL_WEB_INTERFACE=true
-LIGHTTPD_ENABLED=true
+LIGHTTPD_ENABLED=false
 BLOCKING_ENABLED=true
 WEBPASSWORD=$pi_wd
 DNSMASQ_LISTENING=single
-PIHOLE_DNS_1=127.0.0.1#5599
 DNS_FQDN_REQUIRED=true
 DNS_BOGUS_PRIV=true
 DNSSEC=false
 CONDITIONAL_FORWARDING=false
 EOF
-
 bash <(wget --no-check-certificate -qO- http://raw.githubusercontent.com/pi-hole/pi-hole/master/automated%20install/basic-install.sh) /dev/stdin --unattended
 
 systemctl mask --now dhcpcd > /dev/null 2>&1
 systemctl daemon-reload > /dev/null 2>&1
+
+rm -rf /etc/resolv.conf
+echo "" > /etc/resolvconf/run/interface/original.resolvconf
+echo "" > /etc/resolvconf/resolv.conf.d/original
+echo "nameserver 127.0.0.1" > /etc/resolvconf/resolv.conf.d/base
+echo "option use-vc"  > /etc/resolvconf/resolv.conf.d/tail
+ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
+resolvconf -u
+
+
+
+sed -i '/server=/d'  /etc/dnsmasq.d/01-pihole.conf
+sed -i '/interface=/i\server=127.0.0.1#5599' /etc/dnsmasq.d/01-pihole.conf
 
 cat << EOF > /etc/pihole/pihole-FTL.conf
 PRIVACYLEVEL=0
 AAAA_QUERY_ANALYSIS=no
 EOF
 
-systemctl restart pihole-FTL
-
 pihole restartdns
 
-set_ip_dns
+
+#set_ip_dns
 
 
 	green " ===========================请重启debian系统=============================="
