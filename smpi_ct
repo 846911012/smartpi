@@ -90,7 +90,8 @@ systemctl daemon-reload > /dev/null 2>&1
 systemctl enable smartdns > /dev/null 2>&1
 systemctl restart smartdns > /dev/null 2>&1
 
-mkdir /etc/pihole/
+cd ~
+mkdir -p /etc/pihole
 
 pi_wd="4739aedfec7b085af55a29976725a386ad39c9d88f1228c6cffe4ee52971b206"
 
@@ -113,17 +114,19 @@ DNSSEC=false
 CONDITIONAL_FORWARDING=false
 EOF
 
-cd ~
-
-git clone --depth 1 https://github.com/pi-hole/pi-hole.git Pi-hole
-bash ~/Pi-hole/"automated install"/basic-install.sh /dev/stdin --unattended
-rm -rf ~/Pi-hole
+bash <(wget --no-check-certificate -qO- http://raw.githubusercontent.com/pi-hole/pi-hole/master/automated%20install/basic-install.sh) /dev/stdin --unattended
 
 systemctl mask --now dhcpcd > /dev/null 2>&1
 systemctl daemon-reload > /dev/null 2>&1
 
+cat << EOF > /etc/pihole/pihole-FTL.conf
+PRIVACYLEVEL=0
+AAAA_QUERY_ANALYSIS=no
+EOF
+
 systemctl restart pihole-FTL
-pihole -f
+
+pihole restartdns
 
 set_ip_dns
 
