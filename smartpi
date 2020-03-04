@@ -51,8 +51,8 @@ apt update && apt upgrade -y
 apt install --no-install-recommends --no-install-suggests -y sudo git net-tools dnsutils curl
 source /etc/profile
 
-wget -O ~/smartdns.deb $sd
-dpkg -i smartdns.deb
+wget --no-check-certificate -O ~/smartdns.deb $sd
+dpkg -i ~/smartdns.deb
 
 cat << EOF > /etc/smartdns/smartdns.conf
 bind :5599
