@@ -41,8 +41,8 @@ rm -rf /etc/apt/preferences.d/limit-unstable
 apt update && apt install -y sudo locales net-tools dnsutils ipset wget curl git jq unzip ca-certificates haveged subversion rsync apt-transport-https gnupg2 lighttpd
 source /etc/profile
 
-wget -O ~/smartdns.deb $sd
-dpkg -i smartdns.deb
+wget --no-check-certificate -O ~/smartdns.deb $sd
+dpkg -i ~/smartdns.deb
 
 cat << EOF > /etc/smartdns/smartdns.conf
 bind :5599
