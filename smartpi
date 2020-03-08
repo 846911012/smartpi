@@ -47,8 +47,8 @@ EOF
 rm -rf /etc/apt/sources.list.d/unstable.list
 rm -rf /etc/apt/preferences.d/limit-unstable
 
-apt update && apt upgrade -y
-apt install --no-install-recommends --no-install-suggests -y sudo git net-tools dnsutils curl
+
+apt update && apt install -y sudo locales net-tools dnsutils ipset wget curl git jq unzip ca-certificates haveged subversion rsync apt-transport-https gnupg2 lighttpd
 source /etc/profile
 
 wget --no-check-certificate -O ~/smartdns.deb $sd
