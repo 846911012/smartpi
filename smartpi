@@ -48,7 +48,7 @@ rm -rf /etc/apt/sources.list.d/unstable.list
 rm -rf /etc/apt/preferences.d/limit-unstable
 
 
-apt update && apt install -y sudo locales net-tools dnsutils ipset wget curl git jq unzip ca-certificates haveged subversion rsync apt-transport-https gnupg2 lighttpd
+apt update && apt install -y sudo locales net-tools dnsutils ipset wget curl git jq unzip ca-certificates haveged subversion rsync apt-transport-https gnupg2 lighttpd resolvconf
 source /etc/profile
 
 wget --no-check-certificate -O ~/smartdns.deb $sd
@@ -106,52 +106,88 @@ cd ~
 mkdir -p /etc/pihole
 
 echo "" > /etc/pihole/adlists.list
-
-cat > /etc/pihole/setupVars.conf << EOF
+cat << EOF > /etc/pihole/setupVars.conf
 PIHOLE_INTERFACE=$eth_n
 IPV4_ADDRESS=$loc_ip/24
-QUERY_LOGGING=false
+PIHOLE_DNS_1=127.0.0.1#5599
+PIHOLE_DNS_2=
+QUERY_LOGGING=true
 INSTALL_WEB_SERVER=true
 INSTALL_WEB_INTERFACE=true
-LIGHTTPD_ENABLED=true
+LIGHTTPD_ENABLED=false
 BLOCKING_ENABLED=true
 WEBPASSWORD=$pi_wd
 DNSMASQ_LISTENING=single
-PIHOLE_DNS_1=127.0.0.1#5599
 DNS_FQDN_REQUIRED=true
 DNS_BOGUS_PRIV=true
 DNSSEC=false
 CONDITIONAL_FORWARDING=false
 EOF
 
-bash <(wget --no-check-certificate -qO- http://raw.githubusercontent.com/pi-hole/pi-hole/master/automated%20install/basic-install.sh) /dev/stdin --unattended
+# systemctl unmask lighttpd
+# cd ~
+# mkdir -p /etc/pihole
 
-systemctl mask --now lighttpd > /dev/null 2>&1
-rm -rf /var/www/html/index.lighttpd.orig
+# bash <(wget --no-check-certificate -qO- http://raw.githubusercontent.com/pi-hole/pi-hole/master/automated%20install/basic-install.sh) /dev/stdin --unattended
+
+# systemctl mask --now lighttpd > /dev/null 2>&1
+# rm -rf /var/www/html/index.lighttpd.orig
+# systemctl mask --now dhcpcd > /dev/null 2>&1
+# systemctl daemon-reload > /dev/null 2>&1
+
+# rm -rf /etc/resolv.conf
+# echo "" > /etc/resolvconf/run/interface/original.resolvconf
+# echo "" > /etc/resolvconf/resolv.conf.d/original
+# echo "nameserver 114.114.114.114" > /etc/resolvconf/resolv.conf.d/base
+# #echo "option use-vc"  > /etc/resolvconf/resolv.conf.d/tail
+# ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
+# resolvconf -u
+
+# cat << EOF > /etc/dnsmasq.conf
+# conf-dir=/etc/dnsmasq.d
+# listen-address=127.0.0.1
+# port=5390
+# EOF
+
+
+# cat << EOF > /etc/pihole/pihole-FTL.conf
+# PRIVACYLEVEL=0
+# AAAA_QUERY_ANALYSIS=no
+# EOF
+
+cd ~
+
+git clone --depth 1 https://github.com/pi-hole/pi-hole.git Pi-hole
+bash ~/Pi-hole/"automated install"/basic-install.sh /dev/stdin --unattended
+rm -rf ~/Pi-hole
+
 systemctl mask --now dhcpcd > /dev/null 2>&1
 systemctl daemon-reload > /dev/null 2>&1
 
-rm -rf /etc/resolv.conf
-echo "" > /etc/resolvconf/run/interface/original.resolvconf
-echo "" > /etc/resolvconf/resolv.conf.d/original
-echo "nameserver 127.0.0.1" > /etc/resolvconf/resolv.conf.d/base
-echo "option use-vc"  > /etc/resolvconf/resolv.conf.d/tail
-ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
-resolvconf -u
+systemctl restart pihole-FTL
+pihole -f
 
-cat << EOF > /etc/dnsmasq.conf
-conf-dir=/etc/dnsmasq.d
-listen-address=127.0.0.1
-port=5390
+rm -rf /etc/resolv.conf
+cat > /etc/resolv.conf << EOF
+nameserver 114.114.114.114
 EOF
 
-
-cat << EOF > /etc/pihole/pihole-FTL.conf
-PRIVACYLEVEL=0
-AAAA_QUERY_ANALYSIS=no
+cat > /etc/resolvconf/resolv.conf.d/base << EOF
+nameserver 114.114.114.114
 EOF
 
 pihole restartdns
+
+cat << EOF > /etc/network/interfaces
+source /etc/network/interfaces.d/*
+auto lo
+iface lo inet loopback
+auto $eth_n
+iface $eth_n inet static
+address $loc_ip
+netmask 255.255.255.0
+gateway $gate_ip
+EOF
 
 
 	green " ===========================请重启debian系统=============================="
