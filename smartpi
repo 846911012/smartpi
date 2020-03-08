@@ -129,13 +129,13 @@ bash <(wget --no-check-certificate -qO- http://raw.githubusercontent.com/pi-hole
 systemctl mask --now dhcpcd > /dev/null 2>&1
 systemctl daemon-reload > /dev/null 2>&1
 
-rm -rf /etc/resolv.conf
-echo "" > /etc/resolvconf/run/interface/original.resolvconf
-echo "" > /etc/resolvconf/resolv.conf.d/original
-echo "nameserver 127.0.0.1" > /etc/resolvconf/resolv.conf.d/base
-echo "option use-vc"  > /etc/resolvconf/resolv.conf.d/tail
-ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
-resolvconf -u
+#rm -rf /etc/resolv.conf
+#echo "" > /etc/resolvconf/run/interface/original.resolvconf
+#echo "" > /etc/resolvconf/resolv.conf.d/original
+#echo "nameserver 127.0.0.1" > /etc/resolvconf/resolv.conf.d/base
+#echo "option use-vc"  > /etc/resolvconf/resolv.conf.d/tail
+#ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
+#resolvconf -u
 
 
 cat << EOF > /etc/pihole/pihole-FTL.conf
@@ -152,7 +152,7 @@ pihole restartdns
     green " Youtube：米月"
     green " 电报群：https://t.me/mi_yue"
     green " Youtube频道地址：https://t.im/n21o"
-    green " version：20200308v1"
+    green " version：20200308v2"
 	green " SmartPi后台地址：http://$loc_ip/admin"
 	green " ===========================请重启debian系统=============================="
 
@@ -216,7 +216,7 @@ start_menu(){
     green " Youtube：米月"
     green " 电报群：https://t.me/mi_yue"
     green " Youtube频道地址：https://t.im/n21o"
-	green " SmartPi版本：20200308v1"
+	green " SmartPi版本：20200308v2"
     green " ========================================================================"
     echo
     green  " 1. 一键安装SmartPi"
