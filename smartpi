@@ -65,7 +65,7 @@ log-level info
 log-file /var/log/smartdns.log
 log-size 128k
 log-num 2
-force-AAAA-SOA yes
+#force-AAAA-SOA yes
 server 223.5.5.5
 server 119.28.28.28
 server 114.114.114.114
@@ -160,7 +160,7 @@ pihole restartdns
     green " Youtube：米月"
     green " 电报群：https://t.me/mi_yue"
     green " Youtube频道地址：https://t.im/n21o"
-    green " version：20200308v5"
+    green " version：20200308v6"
 	green " SmartPi后台地址：http://$loc_ip/admin"
 	green " ===========================请重启debian系统=============================="
 
@@ -224,7 +224,7 @@ start_menu(){
     green " Youtube：米月"
     green " 电报群：https://t.me/mi_yue"
     green " Youtube频道地址：https://t.im/n21o"
-	green " SmartPi版本：20200308v5"
+	green " SmartPi版本：20200308v6"
     green " ========================================================================"
     echo
     green  " 1. 一键安装SmartPi"
