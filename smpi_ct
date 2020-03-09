@@ -111,15 +111,15 @@ WEBPASSWORD=$pi_wd
 #DNSSEC=false
 #CONDITIONAL_FORWARDING=false
 EOF
-bash <(wget --no-check-certificate -qO- http://raw.githubusercontent.com/pi-hole/pi-hole/master/automated%20install/basic-install.sh) /dev/stdin --unattended
+
+cd ~
+
+git clone --depth 1 https://github.com/pi-hole/pi-hole.git Pi-hole
+bash ~/Pi-hole/"automated install"/basic-install.sh /dev/stdin --unattended
+rm -rf ~/Pi-hole
 
 systemctl mask --now dhcpcd > /dev/null 2>&1
 systemctl daemon-reload > /dev/null 2>&1
-
-cat << EOF > /etc/pihole/pihole-FTL.conf
-PRIVACYLEVEL=0
-AAAA_QUERY_ANALYSIS=no
-EOF
 
 pihole restartdns
 
