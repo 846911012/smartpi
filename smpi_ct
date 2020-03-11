@@ -121,6 +121,11 @@ rm -rf ~/Pi-hole
 systemctl mask --now dhcpcd > /dev/null 2>&1
 systemctl daemon-reload > /dev/null 2>&1
 
+cat << EOF > /etc/pihole/pihole-FTL.conf
+PRIVACYLEVEL=0
+AAAA_QUERY_ANALYSIS=no
+EOF
+
 pihole restartdns
 
 
